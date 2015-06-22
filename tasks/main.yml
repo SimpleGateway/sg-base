@@ -1,0 +1,39 @@
+---
+- name: Configure hostname files
+  copy: src={{ item }} dest=/etc/ owner=root group=wheel mode=0640
+  with_items:
+  - etc/hostname.fxp0
+  - etc/hostname.bge0
+  notify:
+  - netstart
+
+- name: Configure hostname
+  copy: src=etc/myname dest=/etc/myname owner=root group=wheel mode=0644
+  notify:
+  - netstart
+
+- name: Configure firewall
+  copy: src=etc/pf.conf dest=/etc/pf.conf owner=root group=wheel mode=0600
+  notify:
+  - pf
+
+- name: Configure dhcpd
+  copy: src=etc/dhcpd.conf dest=/etc/dhcpd.conf owner=root group=wheel mode0644
+
+- name: Configure ntpd
+  copy: src=etc/ntpd.conf dest=/etc/ntpd.conf owner=root group=wheel mode=0644
+  notify:
+  - ntpd
+
+- name: Copy common config
+  copy: src={{ item }} dest=/{{ item }} owner=root group=wheel mode=0644
+  with_items:
+  - etc/pkg.conf
+  - etc/rc.conf.local
+  - etc/rc.securelevel
+  - etc/sysctl.conf
+
+- name: Configure unbound
+  copy: src=var/unbound/etc/unbound.conf dest=/var/unbound/etc/unbound.conf owner=root group=wheel mode=0644
+  notify:
+  - unbound
