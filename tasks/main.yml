@@ -1,14 +1,16 @@
 ---
-- name: Configure hostname files
-  copy: src={{ item }} dest=/etc/ owner=root group=wheel mode=0640
-  with_items:
-  - etc/hostname.fxp0
-  - etc/hostname.bge0
+- name: Configure external interface
+  template: src=etc/hostname.ext dest=/etc/hostname.{{ ext_int }} owner=root group=wheel mode=0640
+  notify:
+  - netstart
+
+- name: Configure internal interface
+  template: src=etc/hostname.int dest=/etc/hostname.{{ int_int }} owner=root group=wheel mode=0640
   notify:
   - netstart
 
 - name: Configure hostname
-  copy: src=etc/myname dest=/etc/myname owner=root group=wheel mode=0644
+  template: src=etc/myname dest=/etc/myname owner=root group=wheel mode=0644
   notify:
   - netstart
 
@@ -18,10 +20,10 @@
   - pf
 
 - name: Configure dhcpd
-  copy: src=etc/dhcpd.conf dest=/etc/dhcpd.conf owner=root group=wheel mode0644
+  template: src=etc/dhcpd.conf dest=/etc/dhcpd.conf owner=root group=wheel mode0644
 
 - name: Configure ntpd
-  copy: src=etc/ntpd.conf dest=/etc/ntpd.conf owner=root group=wheel mode=0644
+  template: src=etc/ntpd.conf dest=/etc/ntpd.conf owner=root group=wheel mode=0644
   notify:
   - ntpd
 
@@ -34,6 +36,6 @@
   - etc/sysctl.conf
 
 - name: Configure unbound
-  copy: src=var/unbound/etc/unbound.conf dest=/var/unbound/etc/unbound.conf owner=root group=wheel mode=0644
+  template: src=var/unbound/etc/unbound.conf dest=/var/unbound/etc/unbound.conf owner=root group=wheel mode=0644
   notify:
   - unbound
