@@ -1,3 +1,4 @@
 dhcpd_flags="bge0"
 ntpd_flags=""
 unbound_flags=""
+nsd_flags=""

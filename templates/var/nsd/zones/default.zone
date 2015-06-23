@@ -1,0 +1,16 @@
+$TTL 10m
+
+@ IN SOA {{ hostname }}.{{ domain }}. netAdmin.{{ domain }}. (
+  {{ dns_SOA }}
+	1h	;refresh
+	3m	;retry
+	2w	;expire
+	1h )	;negative cache
+
+	IN NS {{ hostname}}.{{ domain }}.
+
+{% if staticHosts %}
+{% for service in staticHosts %}
+{{ staticHosts[service].name }} IN A {{ staticHosts[service].addr }}
+{% endfor %}
+{% endif %}
