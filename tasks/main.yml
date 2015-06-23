@@ -40,8 +40,13 @@
   notify:
   - unbound
 
+- name: Build nsd keys
+  command: nsd-control-setup creates=/var/nsd/etc/nsd_server.pem
+  notify:
+  - nsd
+
 - name: Configure nsd
-  template: src=var/nsd/etc/nsd.conf dest=/ owner=root group=wheel mode=0644
+  template: src=var/nsd/etc/nsd.conf dest=/var/nsd/etc/nsd.conf owner=root group=_nsd mode=0640
   notify:
   - nsd
 
