@@ -15,7 +15,7 @@
   - netstart
 
 - name: Configure firewall
-  copy: src=etc/pf.conf dest=/etc/pf.conf owner=root group=wheel mode=0600
+  template: src=etc/pf.conf dest=/etc/pf.conf owner=root group=wheel mode=0600
   notify:
   - pf
 
