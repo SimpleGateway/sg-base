@@ -31,9 +31,15 @@
   copy: src={{ item }} dest=/{{ item }} owner=root group=wheel mode=0644
   with_items:
   - etc/pkg.conf
-  - etc/rc.conf.local
   - etc/rc.securelevel
   - etc/sysctl.conf
+
+- name: Configure rc.conf.local
+  template: src=etc/rc.conf.local dest=/etc/rc.conf.local owner=root group=wheel mode=0644
+  notify:
+  - unbound
+  - nsd
+  - dhcpd
 
 - name: Configure unbound
   template: src=var/unbound/etc/unbound.conf dest=/var/unbound/etc/unbound.conf owner=root group=wheel mode=0644
