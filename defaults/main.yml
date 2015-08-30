@@ -12,6 +12,8 @@ dns_SOA: 2015010101
 
 int_int: bge0
 ext_int: fxp0
+ext_ip:
+ext_dns:
 
 boot_fname:
 boot_next:
