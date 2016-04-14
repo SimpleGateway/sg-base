@@ -21,6 +21,8 @@
 
 - name: Configure dhcpd
   template: src=etc/dhcpd.conf dest=/etc/dhcpd.conf owner=root group=wheel mode=0644
+  notify:
+  - dhcpd
 
 - name: Configure ntpd
   template: src=etc/ntpd.conf dest=/etc/ntpd.conf owner=root group=wheel mode=0644
