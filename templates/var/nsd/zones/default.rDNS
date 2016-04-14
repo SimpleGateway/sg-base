@@ -9,7 +9,7 @@ $TTL 10m
 
 	IN NS {{ hostname}}.{{ domain }}.
 
-{% if staticHosts %}
+{% if staticHosts is defined %}
 {% for service in staticHosts %}
 {{ staticHosts[service].addr | regex_replace('^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$','\\4') }} IN PTR {{ staticHosts[service].name }}.{{ domain }}.
 {% endfor %}

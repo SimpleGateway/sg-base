@@ -9,7 +9,7 @@ $TTL 10m
 
 	IN NS {{ hostname}}.{{ domain }}.
 
-{% if staticHosts %}
+{% if staticHosts is defined %}
 {% for service in staticHosts %}
 {{ staticHosts[service].name }} IN A {{ staticHosts[service].addr }}
 {% endfor %}
