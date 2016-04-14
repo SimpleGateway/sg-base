@@ -41,6 +41,11 @@
   - nsd
   - dhcpd
 
+- name: Build unbound keys
+  command: unbound-control-setup creates=/var/unbound/etc/unbound_server.pem
+  notify:
+  - unbound
+
 - name: Configure unbound
   template: src=var/unbound/etc/unbound.conf dest=/var/unbound/etc/unbound.conf owner=root group=wheel mode=0644
   notify:
