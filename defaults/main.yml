@@ -21,15 +21,15 @@ boot_next:
 ntp:
 - pool.ntp.org
 
-staticHosts:
-  example:
-    mac: 00:00:fa:ce:b0:0c
-    addr: 10.0.1.127
-    name: foo
+# staticHosts:
+#   example:
+#     mac: 00:00:fa:ce:b0:0c
+#     addr: 10.0.1.127
+#     name: foo
 
-stubZones:
-  example:
-    name: foo
-    addresses:
-      - 172.16.0.1
-      - 172.16.0.2
+# stubZones:
+#   example:
+#     name: foo
+#     addresses:
+#       - 172.16.0.1
+#       - 172.16.0.2
