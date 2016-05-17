@@ -12,5 +12,10 @@ $TTL 10m
 {% if staticHosts is defined %}
 {% for service in staticHosts %}
 {{ staticHosts[service].name }} IN A {{ staticHosts[service].addr }}
+{% if staticHosts[service].CNAME is defined %}
+{% for cname in staticHosts[service].CNAME %}
+{{ cname }} IN CNAME {{ staticHosts[service].name }}
+{% endfor %}
+{% endif %}
 {% endfor %}
 {% endif %}
