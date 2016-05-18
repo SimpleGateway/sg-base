@@ -69,6 +69,6 @@
     - nsd
 
 - name: Configure nsd reverse zone
-  template: src=var/nsd/zones/default.rDNS dest=/var/nsd/zones/{{ gw_network | regex_replace('^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$','\\3.\\2.\\1')}}.in-arpa.arpa owner=root group=wheel mode=0644
+  template: src=var/nsd/zones/default.rDNS dest=/var/nsd/zones/{{ gw_network | regex_replace('^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$','\\3.\\2.\\1')}}.in-addr.arpa owner=root group=wheel mode=0644
   notify:
     - nsd
