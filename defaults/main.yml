@@ -10,8 +10,8 @@ hostname: server
 
 dns_SOA: 2015010101
 
-int_int: bge0
-ext_int: fxp0
+int_if: bge0
+ext_if: fxp0
 ext_ip:
 ext_dns:
 

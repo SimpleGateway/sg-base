@@ -1,4 +1,7 @@
 ---
+- name: rc.conf.local
+  assemble: src=/etc/rc.conf.local.d dest=/etc/rc.conf.local owner=root group=wheel mode=0644
+
 - name: netstart
   command: sh /etc/netstart
 

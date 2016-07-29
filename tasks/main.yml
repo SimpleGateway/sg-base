@@ -1,11 +1,11 @@
 ---
 - name: Configure external interface
-  template: src=etc/hostname.ext dest=/etc/hostname.{{ ext_int }} owner=root group=wheel mode=0640
+  template: src=etc/hostname.ext dest=/etc/hostname.{{ ext_if }} owner=root group=wheel mode=0640
   notify:
     - netstart
 
 - name: Configure internal interface
-  template: src=etc/hostname.int dest=/etc/hostname.{{ int_int }} owner=root group=wheel mode=0640
+  template: src=etc/hostname.int dest=/etc/hostname.{{ int_if }} owner=root group=wheel mode=0640
   notify:
     - netstart
 
@@ -36,9 +36,13 @@
     - etc/rc.securelevel
     - etc/sysctl.conf
 
+- name: Create rc.conf.local.d
+  file: path=/etc/rc.conf.local.d state=directory owner=root group=wheel mode=0644
+
 - name: Configure rc.conf.local
-  template: src=etc/rc.conf.local dest=/etc/rc.conf.local owner=root group=wheel mode=0644
+  template: src=etc/rc.conf.local dest=/etc/rc.conf.local.d/00-base owner=root group=wheel mode=0644
   notify:
+    - rc.conf.local
     - unbound
     - nsd
     - dhcpd
