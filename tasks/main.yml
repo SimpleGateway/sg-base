@@ -39,7 +39,7 @@
 - name: Create rc.conf.local.d
   file: path=/etc/rc.conf.local.d state=directory owner=root group=wheel mode=0644
 
-- name: Configure rc.conf.local
+- name: Enable base services
   template: src=etc/rc.conf.local dest=/etc/rc.conf.local.d/00-base owner=root group=wheel mode=0644
   notify:
     - rc.conf.local
