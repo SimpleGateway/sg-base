@@ -10,6 +10,8 @@ $TTL 10m
 	IN NS {{ hostname}}.{{ domain }}.
         IN A  {{ domain_address | default(dhcp_self) }}
 
+{{ hostname }} IN A {{ dhcp_self }}
+
 {% if staticHosts is defined %}
 {% for service in staticHosts %}
 {{ staticHosts[service].name }} IN A {{ staticHosts[service].addr }}
