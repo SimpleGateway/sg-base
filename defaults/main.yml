@@ -30,6 +30,8 @@ ntp:
 # stubZones:
 #   example:
 #     name: foo
+#     private: true
+#     localZone: 16.172.in-addr.arpa
 #     addresses:
 #       - 172.16.0.1
 #       - 172.16.0.2
