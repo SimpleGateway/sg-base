@@ -8,7 +8,7 @@ $TTL 10m
 	1h )	;negative cache
 
 	IN NS {{ hostname}}.{{ domain }}.
-        IN A  {{ domain_address | default(dhcp_self) }}
+	IN A  {{ domain_address | default(dhcp_self) }}
 
 {{ hostname }} IN A {{ dhcp_self }}
 
