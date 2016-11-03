@@ -21,11 +21,31 @@ boot_next:
 ntp:
 - pool.ntp.org
 
+
+# acceptPorts:
+#   ssh:
+#     fromIP: 10.0.0.0/8
+#     proto: tcp
+#     port: 22
+#   mosh:
+#     fromIP: 10.0.0.0/8
+#     proto: udp
+#     port: 60001:60999
+
 # staticHosts:
 #   example:
 #     mac: 00:00:fa:ce:b0:0c
 #     addr: 10.0.1.127
 #     name: foo
+#     ports:
+#       ssh:
+#         proto: tcp
+#         fromIP: 10.0.0.0/8
+#         port: 22022
+#         destport: 22
+#       web:
+#         proto: tcp
+#         port:22
 
 # stubZones:
 #   example:
