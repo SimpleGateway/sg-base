@@ -1,0 +1,7 @@
+{% if sg_common_ext_ip != None %}
+inet {{ sg_common_ext_ip }} 255.255.255.0
+{% else %}
+dhcp
+{% endif %}
+-inet6
+up

@@ -1,44 +1,60 @@
 ---
 - name: Configure external interface
-  template: src=etc/hostname.ext dest=/etc/hostname.{{ ext_if }} owner=root group=wheel mode=0640
+  template:
+    src: hostname.ext
+    dest: /etc/hostname.{{ sg_common_ext_if }}
+    owner: root
+    group: wheel
+    mode: 0640
   notify:
     - netstart
 
 - name: Configure internal interface
-  template: src=etc/hostname.int dest=/etc/hostname.{{ int_if }} owner=root group=wheel mode=0640
+  template:
+    src: hostname.int
+    dest: /etc/hostname.{{ sg_common_int_if }}
+    owner: root
+    group: wheel
+    mode: 0640
   notify:
     - netstart
 
 - name: Configure hostname
-  template: src=etc/myname dest=/etc/myname owner=root group=wheel mode=0644
+  template:
+    src: myname
+    dest: /etc/myname
+    owner: root
+    group: wheel
+    mode: 0644
   notify:
     - netstart
 
 - name: Configure firewall
-  template: src=etc/pf.conf dest=/etc/pf.conf owner=root group=wheel mode=0600
+  template:
+    src: pf.conf
+    dest: /etc/pf.conf
+    owner: root
+    group: wheel
+    mode: 0600
   notify:
     - pf
 
-- name: Configure dhcpd
-  template: src=etc/dhcpd.conf dest=/etc/dhcpd.conf owner=root group=wheel mode=0644
-  notify:
-    - dhcpd
-
 - name: Copy common config
-  copy: src={{ item }} dest=/{{ item }} owner=root group=wheel mode=0644
+  copy:
+    src: "{{ item }}"
+    dest: /etc/{{ item }}
+    owner: root
+    group: wheel
+    mode: 0644
   with_items:
-    - etc/pkg.conf
-    - etc/rc.securelevel
-    - etc/sysctl.conf
+    - pkg.conf
+    - rc.securelevel
+    - sysctl.conf
 
 - name: Create rc.conf.local.d
-  file: path=/etc/rc.conf.local.d state=directory owner=root group=wheel mode=0644
-
-- name: Enable base services
-  template: src=etc/rc.conf.local dest=/etc/rc.conf.local.d/00-base owner=root group=wheel mode=0644
-  notify:
-    - rc.conf.local
-    - dhcpd
-
-- name: Configure resolv.conf
-  template: src=etc/resolv.conf dest=/etc/resolv.conf owner=root group=wheel mode=0644
+  file:
+    path: /etc/rc.conf.local.d
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0644

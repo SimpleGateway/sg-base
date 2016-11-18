@@ -1,7 +1,0 @@
-{% if ext_ip != None %}
-inet {{ ext_ip }} 255.255.255.0
-{% else %}
-dhcp
-{% endif %}
--inet6
-up

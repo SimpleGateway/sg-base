@@ -1,3 +1,0 @@
-inet {{ dhcp_self }} 255.255.255.0 NONE
--inet6
-up

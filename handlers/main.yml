@@ -10,8 +10,5 @@
 - name: netstart
   command: sh /etc/netstart
 
-- name: dhcpd
-  command: /etc/rc.d/dhcpd restart
-
 - name: pf
   command: pfctl -f /etc/pf.conf

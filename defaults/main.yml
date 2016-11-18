@@ -1,22 +1,15 @@
 ---
-gw_network: 10.0.1.0
+sg_common_int_if: bge0
+sg_common_int_ip:
 
-dhcp_self: 10.0.1.1
-dhcp_lower: 10.0.1.2
-dhcp_upper: 10.0.1.128
+sg_common_ext_if: fxp0
+sg_common_ext_ip:
+sg_common_ext_dns:
 
-domain: domain.tld
-hostname: server
+sg_common_domain: domain.tld
+sg_common_hostname: simple-gateway
 
-int_if: bge0
-ext_if: fxp0
-ext_ip:
-ext_dns:
-
-boot_fname:
-boot_next:
-
-# staticHosts:
+# sg_common_staticHosts:
 #   example:
 #     mac: 00:00:fa:ce:b0:0c
 #     addr: 10.0.1.127
