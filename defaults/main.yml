@@ -16,9 +16,6 @@ ext_dns:
 boot_fname:
 boot_next:
 
-ntp:
-- pool.ntp.org
-
 # staticHosts:
 #   example:
 #     mac: 00:00:fa:ce:b0:0c

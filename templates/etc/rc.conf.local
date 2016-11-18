@@ -1,2 +1,1 @@
 dhcpd_flags="{{ int_if }}"
-ntpd_flags=""

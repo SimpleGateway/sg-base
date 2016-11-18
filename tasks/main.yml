@@ -24,11 +24,6 @@
   notify:
     - dhcpd
 
-- name: Configure ntpd
-  template: src=etc/ntpd.conf dest=/etc/ntpd.conf owner=root group=wheel mode=0644
-  notify:
-    - ntpd
-
 - name: Copy common config
   copy: src={{ item }} dest=/{{ item }} owner=root group=wheel mode=0644
   with_items:
