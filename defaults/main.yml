@@ -8,8 +8,6 @@ dhcp_upper: 10.0.1.128
 domain: domain.tld
 hostname: server
 
-dns_SOA: 2015010101
-
 int_if: bge0
 ext_if: fxp0
 ext_ip:
