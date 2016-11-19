@@ -1,0 +1,7 @@
+{% if item.address | ipaddr %}
+inet {{ item.address }} {{ item.cidr | ipaddr('netmask') }} NONE
+{% elif item.address == "dhcp" %}
+dhcp
+{% endif %}
+-inet6
+up

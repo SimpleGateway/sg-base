@@ -1,1 +1,0 @@
-{{ sg_common_hostname }}.{{ sg_common_domain }}

@@ -1,27 +1,18 @@
 ---
-- name: Configure external interface
+- name: Configure interfaces
   template:
-    src: hostname.ext
-    dest: /etc/hostname.{{ sg_common_ext_if }}
+    src: hostname.interface.j2
+    dest: /etc/hostname.{{ item.name }}
     owner: root
     group: wheel
     mode: 0640
   notify:
     - netstart
-
-- name: Configure internal interface
-  template:
-    src: hostname.int
-    dest: /etc/hostname.{{ sg_common_int_if }}
-    owner: root
-    group: wheel
-    mode: 0640
-  notify:
-    - netstart
+  with_items: "{{ sg_network }}"
 
 - name: Configure hostname
   template:
-    src: myname
+    src: myname.j2
     dest: /etc/myname
     owner: root
     group: wheel
@@ -29,15 +20,23 @@
   notify:
     - netstart
 
-- name: Configure firewall
+- name: Create /etc/pf.d
+  file:
+    path: /etc/pf.d
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0750
+
+- name: Configure base firewall rules
   template:
-    src: pf.conf
-    dest: /etc/pf.conf
+    src: pf.base.j2
+    dest: /etc/pf.d/00-base
     owner: root
     group: wheel
     mode: 0600
   notify:
-    - pf
+    - pf.conf
 
 - name: Copy common config
   copy:

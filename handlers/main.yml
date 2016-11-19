@@ -10,5 +10,15 @@
 - name: netstart
   command: sh /etc/netstart
 
+- name: pf.conf
+  assemble:
+    src: /etc/pf.d
+    dest: /etc/pf.conf
+    owner: root
+    group: wheel
+    mode: 0600
+  notify:
+    - pf
+
 - name: pf
   command: pfctl -f /etc/pf.conf

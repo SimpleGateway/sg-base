@@ -1,0 +1,44 @@
+# Inferface Listing
+{% for interface in sg_network %}
+# {{ interface.name }}: {{ interface.desc }}
+{% endfor %}
+# End Interface Listing
+
+# Addresses that should never be seen on global networks
+table <martians> const {0.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.2.0/24 192.168.0.0/16 !192.168.42.0/24 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 240.0.0.0/4}
+
+# Configure default policies
+set block-policy {{ sg_globalconf.pf.block_policy }}
+set skip on lo
+block log
+
+# Permit ping of the gateway
+pass proto icmp
+
+{% for interface in sg_network %}
+#==============================================================================
+# Configuration for {{ interface.name }}
+# {{ interface.desc }}
+#==============================================================================
+{% if "ssh" in interface.services %}
+# Permit SSH
+pass in on {{ interface.name }} inet proto tcp to any port ssh
+pass out on {{ interface.name }} inet proto tcp to any port ssh
+{% endif %}
+
+{% if "nat" in interface.services %}
+# Use NAT
+match out on egress inet from {{ interface.name }}:network to any nat-to (egress:0)
+{% endif %}
+
+# Permit traffic
+pass in on {{ interface.name }}
+pass out on {{ interface.name }}
+
+{% endfor %}
+# IPv6
+block inet6
+
+# No Funny Business
+block in on egress from <martians>
+block in log from urpf-failed label uRPF
