@@ -9,6 +9,8 @@
   notify:
     - netstart
   with_items: "{{ sg_network }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: Configure hostname
   template:
