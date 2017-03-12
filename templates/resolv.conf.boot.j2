@@ -1,0 +1,4 @@
+lookup file bind
+{% for resolver in sg_globalconf.bootresolvers %}
+nameserver {{ resolver }}
+{% endfor %}

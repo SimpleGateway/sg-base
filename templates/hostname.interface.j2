@@ -1,7 +1,24 @@
+{% if item.name == sg_interfaces[0].name %}
+{# This handles the case where we boot faster that the upstream resolver #}
+!cp /etc/resolv.conf.boot /etc/resolv.conf
+{% endif %}
+{% if item.syncdev is defined %}
+up syncdev {{ item.syncdev }}
+{% else %}
+{% if item.address is defined %}
+{% if item.carpdev is defined %}
+inet {{ item.address | ipaddr('address') }} {{ item.address | ipaddr('netmask') }} NONE vhid {{ item.vhid }} carpdev {{ item.carpdev }} advskew {{ item.advskew }}
+{% else %}
 {% if item.address | ipaddr %}
-inet {{ item.address }} {{ item.cidr | ipaddr('netmask') }} NONE
+inet {{ item.address | ipaddr('address') }} {{ item.address | ipaddr('netmask') }} NONE
+{% if item.aliases is defined %}
+{% for alias in item.aliases %}
+inet alias {{ alias | ipaddr('address') }} {{ alias | ipaddr('netmask') }}
+{% endfor %}
+{% endif %}
 {% elif item.address == "dhcp" %}
 dhcp
 {% endif %}
--inet6
-up
+{% endif %}
+{% endif %}
+{% endif %}

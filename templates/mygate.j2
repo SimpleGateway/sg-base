@@ -1,0 +1,2 @@
+{# This defaults to localhost to account for if dhcp is used for egress #}
+{{ sg_globalconf.default_gateway | default('127.0.0.1') }}

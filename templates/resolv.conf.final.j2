@@ -1,0 +1,7 @@
+lookup file bind
+{# Abandon all hope ye who enter here #}
+{# This gets the address of the first adapter that has dns running on it #}
+{% set net = sg_networks|selectattr('services', 'issuperset', ['dns'])|list|first %}
+{% set interface = sg_interfaces|selectattr('name', 'equalto', net.attach_to) %}
+{% set address = interface|map(attribute='address')|ipaddr('address')|first %}
+nameserver {{ address }}

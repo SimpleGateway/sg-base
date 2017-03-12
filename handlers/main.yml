@@ -22,3 +22,6 @@
 
 - name: pf
   command: pfctl -f /etc/pf.conf
+
+- name: sshd
+  command: /etc/rc.d/sshd restart

@@ -1,5 +1,5 @@
 ---
-- name: Configure interfaces
+- name: Configure Interfaces
   template:
     src: hostname.interface.j2
     dest: /etc/hostname.{{ item.name }}
@@ -8,7 +8,7 @@
     mode: 0640
   notify:
     - netstart
-  with_items: "{{ sg_network }}"
+  with_items: "{{ sg_interfaces }}"
   loop_control:
     label: "{{ item.name }}"
 
@@ -48,9 +48,50 @@
     group: wheel
     mode: 0644
   with_items:
-    - pkg.conf
     - rc.securelevel
     - sysctl.conf
+
+- name: Configure SSH
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: wheel
+    mode: 0644
+  notify:
+    - sshd
+
+- name: Copy SSH banner
+  copy:
+    src: "{{ sshd_banner | default('sshd_banner') }}"
+    dest: /etc/ssh/sshd_banner
+    owner: root
+    group: wheel
+    mode: 0644
+  notify:
+    - sshd
+    
+- name: Configure package system
+  template:
+    src: pkg.conf.j2
+    dest: /etc/pkg.conf
+    owner: root
+    group: wheel
+    mode: 0644
+    
+- name: Template Startup Control Files
+  template:
+    src: "{{ item }}.j2"
+    dest: /etc/{{ item }}
+    owner: root
+    group: wheel
+    mode: 0644
+  with_items:
+    - hosts
+    - myname
+    - mygate
+    - resolv.conf.boot
+    - resolv.conf.final
 
 - name: Create rc.conf.local.d
   file:
@@ -59,3 +100,13 @@
     owner: root
     group: wheel
     mode: 0644
+
+- name: Create rc.local
+  copy:
+    src: rc.local
+    dest: /etc/rc.local
+    owner: root
+    group: wheel
+    mode: 0644
+  when: sg_networks|selectattr('services', 'issuperset', ['dhcp'])|list
+

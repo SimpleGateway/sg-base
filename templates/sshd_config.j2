@@ -1,0 +1,10 @@
+PermitRootLogin no
+
+AuthorizedKeysFile	.ssh/authorized_keys
+{% if sg_globalconf.ssh is defined  and sg_globalconf.ssh.permit_password is defined %}
+PasswordAuthentication {{ sg_globalconf.ssh.permit_password | ternary('yes', 'no') }}
+{% endif %}
+
+Banner /etc/ssh/sshd_banner
+
+Subsystem	sftp	/usr/libexec/sftp-server

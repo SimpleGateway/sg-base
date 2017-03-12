@@ -1,11 +1,19 @@
 # Inferface Listing
-{% for interface in sg_network %}
+{% for interface in sg_interfaces %}
 # {{ interface.name }}: {{ interface.desc }}
 {% endfor %}
 # End Interface Listing
 
 # Addresses that should never be seen on global networks
-table <martians> const {0.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.2.0/24 192.168.0.0/16 !192.168.42.0/24 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 240.0.0.0/4}
+table <martians> const {0.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.2.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 240.0.0.0/4 {% for network in sg_networks %}!{{ network.cidr }} {% endfor %}}
+
+# Setup the skips for 'special' interfaces
+{% for interface in sg_interfaces %}
+{% if interface.syncdev is defined %}
+# This is the backing syncdev for {{ interface.name }}
+set skip on {{ interface.syncdev }}
+{% endif %}
+{% endfor %}
 
 # Configure default policies
 set block-policy {{ sg_globalconf.pf.block_policy }}
@@ -15,27 +23,130 @@ block log
 # Permit ping of the gateway
 pass proto icmp
 
-{% for interface in sg_network %}
-#==============================================================================
-# Configuration for {{ interface.name }}
-# {{ interface.desc }}
-#==============================================================================
-{% if "ssh" in interface.services %}
-# Permit SSH
-pass in on {{ interface.name }} inet proto tcp to any port ssh
-pass out on {{ interface.name }} inet proto tcp to any port ssh
-{% endif %}
-
-{% if "nat" in interface.services %}
-# Use NAT
-match out on egress inet from {{ interface.name }}:network to any nat-to (egress:0)
-{% endif %}
-
-# Permit traffic
-pass in on {{ interface.name }}
-pass out on {{ interface.name }}
-
+{% for interface in sg_interfaces|json_query('[].carpdev')|list|unique %}
+# Set pass on CARP interfaces
+pass in on {{ interface }} proto carp keep state (no-sync)
+pass out on {{ interface }} proto carp keep state (no-sync)
 {% endfor %}
+
+pass out on egress proto tcp to {{ sg_pkg_server }} port {80 443}
+
+{% if sg_globalconf.ssh is defined and sg_globalconf.ssh.listen_egress is defined %}
+{% if sg_globalconf.ssh.listen_egress %}
+pass in on egress proto tcp to any port ssh
+
+{% endif %}
+{% endif %}
+{# The blank line is in the if case above to prevent a double space #}
+{% for network in sg_networks %}
+{% if network.services or network.hosts %}
+{# Its really handy to know this interface later, so we just grab it here #}
+{% set interface = sg_interfaces|selectattr('name', 'equalto', network.attach_to)|first %}
+{% if interface.carpdev is defined %}
+{# OpenBSD recommends only filtering on the real interface #}
+{% set filter_interface = interface.carpdev %}
+{% else %}
+{% set filter_interface = interface.name %}
+{% endif %}
+#===============================================================================
+# Network: {{ network.name }}
+# Description: {{ network.desc }}
+#===============================================================================
+{% endif %}
+{# First we setup the services, then we setup the NAT rules, then rdr rules #}
+{% if 'ssh' in network.services %}
+# The router will accept ssh on this network.
+# The implication is that devices on this network are trusted.
+pass in on {{ filter_interface }} inet proto tcp to {{ filter_interface }} port ssh
+{% if 'jumphost' in network.services %}
+pass out on {{ filter_interface }} inet proto tcp to any port ssh
+{% endif %}
+
+{% endif %}
+{% if 'ntp' in network.services %}
+# Local NTP is provided on this network.
+pass in on {{ filter_interface }} inet proto tcp to {{ interface.name }} port ntp
+
+{% endif %}
+{% if 'dns' in network.services %}
+# DNS is offered on this network.
+pass in on {{ filter_interface }} inet proto {tcp udp} to {{ interface.name }} port domain
+pass out on egress inet proto {tcp udp} from egress to any port domain
+
+{% endif %}
+{% if 'nat' in network.services %}
+{% set nat_out = 'egress' %}
+{# first we need to see if there's a nat_to directive in this network's
+  serviceconf, if there is we will nat_to that.  Otherwise we'll nat-to the all
+  adapters in the egress group using the round-robin mode. #}
+{% if network.serviceconf.nat is defined and network.serviceconf.nat.nat_to is defined %}
+{% set nat_to = network.serviceconf.nat.nat_to %}
+{# Now we need to flatten out carp devices since we can only do filtering on
+  the real routing interfaces #}
+{% set nat_out = sg_interfaces|selectattr('name', 'equalto', nat_to)|first %}
+{% if nat_out.carpdev is defined %}
+{% set nat_out = nat_out.carpdev %}
+{% else %}
+{% set nat_out = nat_out.name %}
+{% endif %}
+{% else %}
+{% set nat_to = nat_out %}
+{% endif %}
+# NAT out traffic to {{ nat_to }}
+match out on {{ nat_out }} inet from {{ filter_interface }}:network to any nat-to ({{ nat_to }})
+
+# Once a packet has been passed in, it still needs to be passed out.
+pass out on {{ nat_out }}
+
+# This sets the 'next action' for packets that were passed in on
+# egress, in this case they were almost certainly destined for an
+# internal host.
+pass out on {{ filter_interface }} received-on egress
+{% if network.serviceconf.nat.mode == 'dhcp' %}
+table <activedhcp> persist
+table <baddhcp> persist
+pass in on {{ filter_interface }} from <activedhcp>
+{% endif %}
+{% if network.serviceconf.nat.autonat is defined %}
+{% for cidr in network.serviceconf.nat.autonat %}
+pass in on {{ filter_interface }} from {{ cidr }}
+{% endfor %}
+
+{% endif %}
+{% if network.hosts is defined %}
+{# TODO: only print this out if at least one host has firewall rules #}
+#-------------------------------------------------------------------------------
+# Per Host Rules
+#-------------------------------------------------------------------------------
+
+{% for host in network.hosts %}
+{% if host.pf is defined %}
+{% if host.desc is defined %}
+# {{ host.desc }}
+{% if host.pf.in is defined %}
+{% for rule in host.pf.in %}
+pass in on egress proto {{ rule.proto }} from {{ rule.src }} to {{ rule.to|default('any') }} port {{ rule.port }} rdr-to {{ host.addr }}{% if rule.dest_port is defined %} port {{ rule.dest_port }}
+{% else %}
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if host.pf.out is defined %}
+{% for rule in host.pf.out %}
+pass in on {{ filter_interface }} proto {{ rule.proto }} from {{ host.addr }} to {{ rule.dest }}{% if rule.port != 'any' %} port {{ rule.port }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{# The following blank line seperates multiple hosts #}
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{# The following blank line seperates multiple networks #}
+
 # IPv6
 block inet6
 

@@ -1,0 +1,13 @@
+127.0.0.1	localhost
+::1		localhost
+
+{# This might seem like an epic kludge, but really this allows us to
+absolutely know that pf will come up even if the external boot
+resolver is absolutely dead.  This list must contain all symbolic
+names that are used in the pf rules for hosts managed by this
+router. #}
+{% if sg_globalconf.boothosts is defined %}
+{% for host in sg_globalconf.boothosts %}
+{{ host.ip }}	{{ host.name }}
+{% endfor %}
+{% endif %}
