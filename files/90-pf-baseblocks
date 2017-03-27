@@ -1,0 +1,6 @@
+# IPv6
+block inet6
+
+# No Funny Business
+block in on egress from <martians>
+block in log from urpf-failed label uRPF

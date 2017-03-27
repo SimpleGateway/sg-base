@@ -146,10 +146,3 @@ pass in on {{ filter_interface }} proto {{ rule.proto }} from {{ host.addr }} to
 {% endif %}
 {% endfor %}
 {# The following blank line seperates multiple networks #}
-
-# IPv6
-block inet6
-
-# No Funny Business
-block in on egress from <martians>
-block in log from urpf-failed label uRPF

@@ -32,8 +32,18 @@
 
 - name: Configure base firewall rules
   template:
-    src: pf.base.j2
+    src: 00-pf-base.j2
     dest: /etc/pf.d/00-base
+    owner: root
+    group: wheel
+    mode: 0600
+  notify:
+    - pf.conf
+
+- name: Configure base firewall blocks
+  copy:
+    src: 90-pf-baseblocks
+    dest: /etc/pf.d/90-baseblocks
     owner: root
     group: wheel
     mode: 0600
