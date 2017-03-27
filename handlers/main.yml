@@ -25,3 +25,11 @@
 
 - name: sshd
   command: /etc/rc.d/sshd restart
+
+- name: crontab
+  assemble:
+    src: /etc/crontab.d/
+    dest: /etc/crontab
+    owner: root
+    group: wheel
+    mode: 0600

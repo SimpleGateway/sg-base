@@ -120,3 +120,10 @@
     mode: 0644
   when: sg_networks|selectattr('services', 'issuperset', ['dhcp'])|list
 
+- name: Create /etc/crontab.d/
+  file:
+    path: /etc/crontab.d/
+    state: directory
+    owner: root
+    group: wheel
+    mode: 0644
