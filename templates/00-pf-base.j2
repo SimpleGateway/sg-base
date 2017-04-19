@@ -120,7 +120,7 @@ pass in on {{ filter_interface }} from {{ cidr }}
 #-------------------------------------------------------------------------------
 
 {% for host in network.hosts %}
-{% if host.pf is defined %}
+{% if host.pf is defined or host.visible_to is defined %}
 {% if host.desc is defined %}
 # {{ host.desc }}
 {% if host.pf.in is defined %}
@@ -136,6 +136,12 @@ pass in on egress proto {{ rule.proto }} from {{ rule.src }} to {{ rule.to|defau
 {% for rule in host.pf.out %}
 pass in on {{ filter_interface }} proto {{ rule.proto }} from {{ host.addr }} to {{ rule.dest }}{% if rule.port != 'any' %} port {{ rule.port }}
 {% endif %}
+{% endfor %}
+{% endif %}
+{% if host.visible_to is defined %}
+{% for net in host.visible_to %}
+{% set vnet = sg_networks|selectattr('name', 'equalto', net)|first %}
+pass out on {{ filter_interface }} proto {tcp udp} from {{ vnet.cidr }} to {{ host.addr }}
 {% endfor %}
 {% endif %}
 {# The following blank line seperates multiple hosts #}
