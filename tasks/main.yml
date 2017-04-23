@@ -83,8 +83,8 @@
     
 - name: Configure package system
   template:
-    src: pkg.conf.j2
-    dest: /etc/pkg.conf
+    src: installurl.j2
+    dest: /etc/installurl
     owner: root
     group: wheel
     mode: 0644
