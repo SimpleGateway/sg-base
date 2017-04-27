@@ -65,7 +65,7 @@ pass out on {{ filter_interface }} inet proto tcp to any port ssh
 {% endif %}
 {% if 'ntp' in network.services %}
 # Local NTP is provided on this network.
-pass in on {{ filter_interface }} inet proto tcp to {{ interface.name }} port ntp
+pass in on {{ filter_interface }} inet proto udp to {{ interface.name }} port ntp
 
 {% endif %}
 {% if 'dns' in network.services %}
